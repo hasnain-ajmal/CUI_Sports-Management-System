@@ -43,7 +43,7 @@ export function matchCard(match, data) {
     const card = el("article", "match-card bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col");
 
     const top = el("div", "flex items-center justify-between text-xs text-slate-500 mb-3");
-    top.append(el("span", "font-semibold uppercase tracking-wide", `${nameOf(data.sports, match.sportId)} · ${genderLabel(match.gender)}`), statusBadge(match.status));
+    top.append(el("span", "font-semibold uppercase tracking-wide", `${nameOf(data.sports, match.sportId)} · ${genderLabel(match.gender)}${match.league ? ` · ${match.league}` : ""}`), statusBadge(match.status));
 
     const done = match.status === "completed";
     const aWon = done && match.scoreA > match.scoreB;

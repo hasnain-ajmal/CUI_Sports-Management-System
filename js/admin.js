@@ -12,8 +12,9 @@ import {
 } from "./utils.js";
 import {
     validateDepartment, validateCoordinator, validateSport, validateResource, validateTeam,
-    validatePlayer, validateMatch, validateResult, validateAnnouncement
+    validatePlayer, validateMatch, validateResult, validateAnnouncement, validateLeague
 } from "./validators.js";
+import { timeProblem, freeSlots as freeSlotsOn, clashingMatch, planLeague } from "./scheduling.js";
 import { enableProfiles, playerLink, teamLink } from "./profile.js";
 
 let data = null;
@@ -169,12 +170,15 @@ function matchTitle(match) {
 
 // ---------- time slots ----------
 
-// the slots of a ground that are still free on a date (past times of today are not offered)
+// today's date and the current time, so past times are never offered
+function now() {
+    const time = new Date();
+    return { date: todayISO(), time: `${String(time.getHours()).padStart(2, "0")}:${String(time.getMinutes()).padStart(2, "0")}` };
+}
+
+// the standard slots of a ground that are still free on a date
 function freeSlots(resource, date) {
-    const booked = data.matches.filter(match => match.resourceId === resource.id && match.date === date).map(match => match.time);
-    const now = new Date();
-    const nowTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-    return buildSlots(resource).filter(slot => !booked.includes(slot) && !(date === todayISO() && slot <= nowTime));
+    return freeSlotsOn(resource, date, data.matches, now());
 }
 
 // ---------- sections (sidebar and overview cards) ----------
@@ -379,9 +383,10 @@ function renderAvailability() {
 
         const chips = el("div", "slot-chips");
         buildSlots(resource).forEach(slot => {
-            const match = data.matches.find(item => item.resourceId === resource.id && item.date === date && item.time === slot);
+            // a slot is booked when any match on this ground overlaps it
+            const match = clashingMatch(resource, date, slot, data.matches);
             if (match) {
-                const chip = el("span", "slot slot-booked", `${formatTime(slot)} · ${nameOf(data.teams, match.teamA).split(" ")[0]} v ${nameOf(data.teams, match.teamB).split(" ")[0]}`);
+                const chip = el("span", "slot slot-booked", `${formatTime(slot)} · ${nameOf(data.teams, match.teamA).split(" ")[0]} v ${nameOf(data.teams, match.teamB).split(" ")[0]}${match.time !== slot ? ` (${formatTime(match.time)})` : ""}`);
                 chip.title = matchTitle(match);
                 chips.append(chip);
             } else {
@@ -451,7 +456,7 @@ function renderMatches() {
         }
         tbody.append(tableRow([
             el("span", "text-nowrap", `${formatDate(match.date)}, ${formatTime(match.time)}`),
-            `${nameOf(data.sports, match.sportId)} (${genderLabel(match.gender)})`,
+            `${nameOf(data.sports, match.sportId)} (${genderLabel(match.gender)})${match.league ? ` · ${match.league}` : ""}`,
             matchTitle(match),
             nameOf(data.resources, match.resourceId),
             el("span", "text-nowrap", score),
@@ -502,6 +507,10 @@ function fillFormSelects() {
     fillSelect(document.getElementById("playerDepartment"), departments, dept => `${dept.name} (${dept.code})`, firstDept);
     fillSelect(document.getElementById("teamSportSelect"), activeSports, sport => sport.name, "Choose sport");
     fillSelect(document.getElementById("matchSport"), activeSports, sport => sport.name, "Choose sport");
+    if (isAdmin) {
+        fillSelect(document.getElementById("leagueSport"), activeSports.filter(sport => sport.type === "team"), sport => sport.name, "Choose sport");
+        fillLeagueOptions();
+    }
     fillGenderSelect(document.getElementById("teamGenderSelect"), "Men", "Women");
     fillGenderSelect(document.getElementById("matchGender"), "Men", "Women");
     fillGenderSelect(document.getElementById("playerGender"), "Male", "Female");
@@ -551,31 +560,199 @@ function fillPlayerTeams() {
 function fillMatchTeams() {
     const sportId = Number(document.getElementById("matchSport").value);
     const gender = document.getElementById("matchGender").value;
+    const sport = findById(data.sports, sportId);
     const sameSport = data.teams.filter(team => team.sportId === sportId && team.gender === gender);
-    const firstText = sportId && gender ? "Choose team" : "Choose sport and category first";
-    fillSelect(document.getElementById("matchTeamA"), sameSport.filter(team => canManage(team.departmentId, team.gender)), team => team.name, firstText);
-    fillSelect(document.getElementById("matchTeamB"), sameSport, team => team.name, firstText);
+    const mine = sameSport.filter(team => canManage(team.departmentId, team.gender));
+
+    // explain why a list is empty instead of showing an empty dropdown
+    let textA = "Choose team";
+    let textB = "Choose team";
+    if (!sportId || !gender) {
+        textA = textB = "Choose sport and category first";
+    } else if (sameSport.length === 0) {
+        textA = textB = `No ${genderLabel(gender).toLowerCase()}'s ${sport.name.toLowerCase()} teams yet. Add them in Teams.`;
+    } else if (mine.length === 0) {
+        textA = "You have no team in this sport and category";
+    }
+    fillSelect(document.getElementById("matchTeamA"), mine, team => team.name, textA);
+    fillSelect(document.getElementById("matchTeamB"), sameSport, team => team.name, textB);
 
     // grounds where this sport can be played
     const grounds = data.resources.filter(resource => resource.active && resource.sportIds.includes(sportId));
-    fillSelect(document.getElementById("matchResource"), grounds, resource => resource.name, sportId ? (grounds.length ? "Choose ground" : "No ground for this sport") : "Choose sport first");
+    fillSelect(document.getElementById("matchResource"), grounds, resource => `${resource.name} (${formatTime(resource.openTime)} – ${formatTime(resource.closeTime)})`,
+        sportId ? (grounds.length ? "Choose ground" : "No ground for this sport. Add one in Grounds & slots.") : "Choose sport first");
     fillMatchSlots();
 }
 
-// free slots of the chosen ground on the chosen date
+// under the time box: is the typed time free? plus buttons for every free standard slot
 function fillMatchSlots() {
     const resource = findById(data.resources, document.getElementById("matchResource").value);
     const date = document.getElementById("matchDate").value;
-    const select = document.getElementById("matchTime");
-    clear(select);
+    const time = document.getElementById("matchTime").value;
+    const status = document.getElementById("timeStatus");
+    const picker = document.getElementById("slotPicker");
+    clear(picker);
+    status.className = "time-status";
+
     if (!resource || !date) {
-        select.append(new Option("Choose ground and date first", ""));
+        status.textContent = "Choose a ground and a date to see the free times.";
         return;
     }
     const slots = freeSlots(resource, date);
-    select.append(new Option(slots.length ? `Choose (${slots.length} free)` : "No free slot on this day", ""));
-    slots.forEach(slot => select.append(new Option(formatTime(slot), slot)));
+    slots.forEach(slot => {
+        const button = el("button", `slot slot-free slot-pick${slot === time ? " active" : ""}`, formatTime(slot));
+        button.type = "button";
+        button.dataset.time = slot;
+        picker.append(button);
+    });
+
+    if (!time) {
+        status.textContent = slots.length
+            ? `${resource.name} on ${formatDate(date)}: ${slots.length} free start times. Click one, or type your own time.`
+            : `${resource.name} has no free time on ${formatDate(date)}. Try another date or ground.`;
+        return;
+    }
+    const problem = timeProblem(resource, date, time, data.matches, now());
+    status.textContent = problem || `${formatTime(time)} is free at ${resource.name} on ${formatDate(date)}.`;
+    status.classList.add(problem ? "is-busy" : "is-free");
 }
+
+// clicking a free time fills the time box
+document.getElementById("slotPicker").addEventListener("click", event => {
+    const button = event.target.closest("[data-time]");
+    if (button) {
+        document.getElementById("matchTime").value = button.dataset.time;
+        fillMatchSlots();
+    }
+});
+
+// ---------- league scheduler ----------
+
+let leaguePlan = null; // the schedule shown in the preview, waiting to be saved
+
+// tick boxes for the teams and grounds of the chosen sport and category
+function fillLeagueOptions() {
+    const sportId = Number(document.getElementById("leagueSport").value);
+    const gender = document.getElementById("leagueGender").value;
+    const teamBox = document.getElementById("leagueTeams");
+    const groundBox = document.getElementById("leagueGrounds");
+
+    const tickBox = (name, value, label, id) => {
+        const wrap = el("div", "form-check");
+        const input = el("input", "form-check-input");
+        input.type = "checkbox";
+        input.name = name;
+        input.value = value;
+        input.id = id;
+        input.checked = true;
+        const text = el("label", "form-check-label", label);
+        text.htmlFor = id;
+        wrap.append(input, text);
+        return wrap;
+    };
+
+    clear(teamBox);
+    const teams = data.teams.filter(team => team.sportId === sportId && team.gender === gender);
+    if (!sportId || !gender) {
+        teamBox.textContent = "Choose a sport and category first.";
+    } else if (teams.length === 0) {
+        teamBox.textContent = "No teams in this sport and category yet. Add them in Teams.";
+    }
+    teams.forEach(team => teamBox.append(tickBox("teams", team.id, team.name, `leagueTeam${team.id}`)));
+
+    clear(groundBox);
+    const grounds = data.resources.filter(resource => resource.active && resource.sportIds.includes(sportId));
+    if (!sportId) {
+        groundBox.textContent = "Choose a sport first.";
+    } else if (grounds.length === 0) {
+        groundBox.textContent = "No ground for this sport. Add one in Grounds & slots.";
+    }
+    grounds.forEach(resource => groundBox.append(tickBox("grounds", resource.id, `${resource.name} (${resource.slotMinutes} min slots)`, `leagueGround${resource.id}`)));
+    hideLeaguePreview();
+}
+
+function hideLeaguePreview() {
+    leaguePlan = null;
+    document.getElementById("leaguePreview").classList.add("d-none");
+}
+
+document.getElementById("leagueForm").addEventListener("submit", event => {
+    event.preventDefault();
+    const form = event.target;
+    const fields = readForm(form);
+    const teamIds = [...form.querySelectorAll("input[name=teams]:checked")].map(box => Number(box.value));
+    const groundIds = [...form.querySelectorAll("input[name=grounds]:checked")].map(box => Number(box.value));
+    if (!showErrors(form, validateLeague(fields, teamIds, groundIds, todayISO()))) {
+        hideLeaguePreview();
+        return;
+    }
+
+    const result = planLeague({
+        teamIds,
+        resources: groundIds.map(id => findById(data.resources, id)),
+        startDate: fields.startDate,
+        endDate: fields.endDate,
+        fromTime: fields.fromTime,
+        toTime: fields.toTime,
+        matches: data.matches,
+        now: now()
+    });
+    leaguePlan = { ...fields, matches: result.planned };
+
+    const total = result.planned.length + result.unplaced.length;
+    const summary = document.getElementById("leagueSummary");
+    summary.textContent = result.unplaced.length === 0
+        ? `All ${total} matches fit. ${teamIds.length} teams, each plays ${teamIds.length - 1} matches.`
+        : `${result.planned.length} of ${total} matches fit. ${result.unplaced.length} did not fit: add days, widen the hours or tick more grounds, then make the schedule again.`;
+    summary.classList.toggle("text-danger", result.unplaced.length > 0);
+
+    const tbody = document.getElementById("leagueBody");
+    clear(tbody);
+    result.planned.forEach((match, index) => {
+        const tr = el("tr");
+        [index + 1, formatDate(match.date), formatTime(match.time), nameOf(data.resources, match.resourceId),
+            `${nameOf(data.teams, match.teamA)} vs ${nameOf(data.teams, match.teamB)}`].forEach(value => tr.append(el("td", "", String(value))));
+        tbody.append(tr);
+    });
+    result.unplaced.forEach(([teamA, teamB]) => {
+        const tr = el("tr", "table-danger");
+        ["—", "Not placed", "", "", `${nameOf(data.teams, teamA)} vs ${nameOf(data.teams, teamB)}`].forEach(value => tr.append(el("td", "", String(value))));
+        tbody.append(tr);
+    });
+    document.getElementById("saveLeague").disabled = result.planned.length === 0;
+    document.getElementById("saveLeague").textContent = `Save ${result.planned.length} matches`;
+    document.getElementById("leaguePreview").classList.remove("d-none");
+});
+
+document.getElementById("saveLeague").addEventListener("click", () => {
+    if (!leaguePlan || leaguePlan.matches.length === 0) {
+        return;
+    }
+    leaguePlan.matches.forEach(match => {
+        data.matches.push({
+            id: nextId.matches(),
+            sportId: Number(leaguePlan.sportId),
+            gender: leaguePlan.gender,
+            teamA: match.teamA,
+            teamB: match.teamB,
+            resourceId: match.resourceId,
+            date: match.date,
+            time: match.time,
+            status: "upcoming",
+            scoreA: null,
+            scoreB: null,
+            playerOfMatch: null,
+            league: leaguePlan.name,
+            createdBy: user.id
+        });
+    });
+    const count = leaguePlan.matches.length;
+    const name = leaguePlan.name;
+    document.getElementById("leagueForm").reset();
+    hideLeaguePreview();
+    saveAndRender(`${count} matches of "${name}" saved.`);
+    showSection("matches");
+});
 
 function renderAll() {
     renderOverview();
@@ -762,8 +939,8 @@ document.getElementById("matchForm").addEventListener("submit", event => {
     const form = event.target;
     const fields = readForm(form);
     const resource = findById(data.resources, fields.resourceId);
-    const slots = resource && fields.date ? freeSlots(resource, fields.date) : [];
-    const errors = validateMatch(fields, data.teams, data.resources, todayISO(), data.matches, slots);
+    const issue = resource && fields.date && fields.time ? timeProblem(resource, fields.date, fields.time, data.matches, now()) : "";
+    const errors = validateMatch(fields, data.teams, data.resources, todayISO(), data.matches, issue);
     const teamA = findById(data.teams, fields.teamA);
     if (!errors.teamA && teamA && !canManage(teamA.departmentId, teamA.gender)) {
         errors.teamA = "Team A must be one of your own teams.";
@@ -819,6 +996,9 @@ document.querySelectorAll("main form").forEach(form => {
         setTimeout(() => {
             fillPlayerTeams();
             fillMatchTeams();
+            if (form.id === "leagueForm") {
+                fillLeagueOptions();
+            }
         });
     });
 });
@@ -830,6 +1010,9 @@ document.getElementById("matchSport").addEventListener("change", fillMatchTeams)
 document.getElementById("matchGender").addEventListener("change", fillMatchTeams);
 document.getElementById("matchResource").addEventListener("change", fillMatchSlots);
 document.getElementById("matchDate").addEventListener("change", fillMatchSlots);
+document.getElementById("matchTime").addEventListener("input", fillMatchSlots);
+document.getElementById("leagueSport").addEventListener("change", fillLeagueOptions);
+document.getElementById("leagueGender").addEventListener("change", fillLeagueOptions);
 document.getElementById("slotDate").addEventListener("change", renderAvailability);
 document.getElementById("slotCategory").addEventListener("change", renderAvailability);
 document.getElementById("playerSearch").addEventListener("input", renderPlayers);
@@ -1029,6 +1212,8 @@ async function init() {
             nextId[name] = createIdGenerator(maxId(data[name]) + 1);
         });
         document.getElementById("matchDate").min = todayISO();
+        document.getElementById("leagueStart").min = todayISO();
+        document.getElementById("leagueEnd").min = todayISO();
         document.getElementById("slotDate").value = todayISO();
 
         renderAll();

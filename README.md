@@ -66,6 +66,7 @@ sports-management-midterm/
     ├── utils.js             helpers: el(), formatDate(), createIdGenerator() closure...
     ├── validators.js        regular expressions + one validate function per form
     ├── standings.js         points table logic (filter, map, reduce, sort)
+    ├── scheduling.js        time rules on grounds, free slots, round robin and the league planner
     ├── components.js        builds match cards with createElement
     ├── profile.js           player / team record pop-up (<dialog>), opened by clicking a name
     ├── nav.js               mobile menu, active link
@@ -93,19 +94,25 @@ sports-management-midterm/
 1. **Grounds and slots.** The admin adds every ground, court and table (Main Cricket Ground, Badminton Court 1, 2, 3,
    Table Tennis Table 1, 2, 3 …) with a category, the sports played there, opening and closing time and the length of one slot.
    *Grounds & slots* shows, for any date, which slots are free (green) and booked (red).
-2. **Scheduling.** The admin or a coordinator picks sport, men/women and the two teams. Then only grounds that suit
-   that sport are offered, and after choosing a date, only that ground's **free slots** are offered. The date is simply the day the match is planned for.
-3. **Clash rules.** A booked slot can't be booked again, a team plays only one match per day, and new matches can't be put in the past.
+2. **Scheduling one match.** The admin or a coordinator picks sport, men/women and the two teams (if no team exists, the
+   dropdown says so). Only grounds that suit that sport are offered. After choosing a date, the form shows that ground's free
+   start times as buttons; you can click one or **type any start time**, and the box under it says at once whether it is free,
+   booked by another match, or outside opening hours. A match on a ground lasts one slot length, so overlapping times are refused.
+3. **League scheduler (admin).** Choose a league name, sport, category, the teams, the grounds, first and last day and the
+   daily hours. The system pairs every team with every other team once (round robin, circle method) and puts each match into
+   the first free slot, with at most one match per team per day (`planLeague` in `js/scheduling.js`). You see the proposed
+   schedule first; matches that don't fit are shown in red with a hint (add days, widen hours, tick more grounds). *Save* adds them all.
+4. **Clash rules.** A booked slot can't be booked again, a team plays only one match per day, and new matches can't be put in the past.
    A coordinator's Team A must be one of their own teams.
-4. **Status.** Every match is `upcoming` → `live` → `completed`. The admin changes it in the *Start / result* pop-up.
+5. **Status.** Every match is `upcoming` → `live` → `completed`. The admin changes it in the *Start / result* pop-up.
    Live scores show on the home page; only **completed** matches count in the points tables.
-5. **Result.** Only the admin types both scores (runs, goals or points, depending on the sport) and can choose a player of the match.
+6. **Result.** Only the admin types both scores (runs, goals or points, depending on the sport) and can choose a player of the match.
    Higher score wins; equal scores are a draw. Win = 2 points, draw = 1, loss = 0.
-6. **Tables.** The sport table ranks teams by points, then score difference. The department table adds up every
+7. **Tables.** The sport table ranks teams by points, then score difference. The department table adds up every
    team of a department in every sport, men and women, to find the sports week champion.
-7. **Results to enter.** The admin overview lists matches whose date has passed but are not completed yet.
+8. **Results to enter.** The admin overview lists matches whose date has passed but are not completed yet.
 
-There is **no automatic fixture generator** in the midterm: each match is booked into a free slot by hand. Automatic draws and brackets are planned for the MERN version.
+The league scheduler is an inter-department round robin. Knockout brackets and intra-department leagues (teams of sections or batches inside one department) are planned for the MERN version.
 
 ## Who can do what
 

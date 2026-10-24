@@ -5,7 +5,7 @@
 const STORAGE_KEY = "usms-data";
 
 // raise this number when the shape of the JSON data changes, so old saved data is replaced
-const DATA_VERSION = 3;
+const DATA_VERSION = 4;
 
 // every JSON file in the data folder
 const FILES = ["sports", "departments", "teams", "players", "matches", "announcements", "settings", "resources", "users"];

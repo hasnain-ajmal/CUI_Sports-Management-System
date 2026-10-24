@@ -34,6 +34,7 @@
                     <button class="nav-link" data-section="teams">Teams</button>
                     <button class="nav-link" data-section="players">Players</button>
                     <button class="nav-link" data-section="matches">Matches &amp; results</button>
+                    <button class="nav-link" data-section="league" data-role="admin">League scheduler</button>
                     <button class="nav-link" data-section="announcements">Announcements</button>
                 </div>
                 <hr class="border-secondary">
@@ -239,26 +240,6 @@
                         <p>Every ground, court and table of the university, and which time slots are free on a day. Matches can only be booked into a free slot.</p>
                     </header>
 
-                    <div class="panel mb-4">
-                        <div class="panel-head panel-head-row">
-                            <div>
-                                <h2>Free and booked slots</h2>
-                                <p>Green slots are free; red ones already have a match.</p>
-                            </div>
-                            <div class="d-flex gap-2 flex-wrap">
-                                <div>
-                                    <label class="form-label small mb-1" for="slotDate">Date</label>
-                                    <input type="date" id="slotDate" class="form-control form-control-sm">
-                                </div>
-                                <div>
-                                    <label class="form-label small mb-1" for="slotCategory">Category</label>
-                                    <select id="slotCategory" class="form-select form-select-sm"></select>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="availabilityList" class="panel-body availability"></div>
-                    </div>
-
                     <form id="resourceForm" class="panel mb-4" novalidate data-role="admin">
                         <div class="panel-head">
                             <h2>Add ground, court or table</h2>
@@ -318,6 +299,27 @@
                             <button class="btn btn-outline-secondary" type="reset">Clear</button>
                         </div>
                     </form>
+
+                    <div class="panel mb-4">
+                        <div class="panel-head panel-head-row">
+                            <div>
+                                <h2>Free and booked slots</h2>
+                                <p>Green slots are free; red ones already have a match.</p>
+                            </div>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <div>
+                                    <label class="form-label small mb-1" for="slotDate">Date</label>
+                                    <input type="date" id="slotDate" class="form-control form-control-sm">
+                                </div>
+                                <div>
+                                    <label class="form-label small mb-1" for="slotCategory">Category</label>
+                                    <select id="slotCategory" class="form-select form-select-sm"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="availabilityList" class="panel-body availability"></div>
+                    </div>
+
 
                     <div class="panel">
                         <div class="panel-head panel-head-row"><h2>All grounds, courts and tables</h2><span class="count" id="resourceCount"></span></div>
@@ -458,12 +460,12 @@
                 <section id="matches" class="admin-section d-none">
                     <header class="section-head">
                         <h1>Matches &amp; results</h1>
-                        <p id="matchesText">Pick the teams, then a ground and one of its free slots.</p>
+                        <p id="matchesText">Book one match here, or create a whole league in the League section.</p>
                     </header>
                     <form id="matchForm" class="panel mb-4" novalidate>
                         <div class="panel-head">
                             <h2>Schedule a match</h2>
-                            <p>Only grounds that suit the sport, and only their free slots, are offered.</p>
+                            <p>Pick a ground and date, then type a start time or click one of the free times. The form tells you at once if the time is free.</p>
                         </div>
                         <fieldset class="panel-body">
                             <legend class="visually-hidden">Match details</legend>
@@ -499,9 +501,13 @@
                                     <p class="error-text" data-error-for="date"></p>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label" for="matchTime">Free time slot</label>
-                                    <select class="form-select" id="matchTime" name="time"></select>
+                                    <label class="form-label" for="matchTime">Start time</label>
+                                    <input class="form-control" type="time" id="matchTime" name="time" step="300">
                                     <p class="error-text" data-error-for="time"></p>
+                                </div>
+                                <div class="col-12">
+                                    <div id="timeStatus" class="time-status">Choose a sport, ground and date to see the free times.</div>
+                                    <div id="slotPicker" class="slot-chips mt-2" aria-label="Free start times"></div>
                                 </div>
                             </div>
                         </fieldset>
@@ -528,6 +534,94 @@
                             <table class="table table-hover align-middle mb-0">
                                 <thead><tr><th>Date</th><th>Sport</th><th>Match</th><th>Ground</th><th>Score</th><th>Status</th><th class="text-end">Action</th></tr></thead>
                                 <tbody id="matchBody" data-list="matches"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= LEAGUE SCHEDULER (admin) ================= -->
+                <section id="league" class="admin-section d-none">
+                    <header class="section-head">
+                        <h1>League scheduler</h1>
+                        <p>Choose the teams, grounds, days and hours. Every team plays every other team once, and the matches are put into free slots automatically, with at most one match per team per day.</p>
+                    </header>
+                    <form id="leagueForm" class="panel mb-4" novalidate>
+                        <div class="panel-head">
+                            <h2>New league</h2>
+                            <p>Inter-department league: one team from each department plays the others.</p>
+                        </div>
+                        <fieldset class="panel-body">
+                            <legend class="visually-hidden">League details</legend>
+                            <div class="row g-3">
+                                <div class="col-md-6 col-lg-4">
+                                    <label class="form-label" for="leagueName">League name</label>
+                                    <input class="form-control" id="leagueName" name="name" maxlength="50" placeholder="Sports Week Volleyball League">
+                                    <p class="error-text" data-error-for="name"></p>
+                                </div>
+                                <div class="col-md-3 col-lg-4">
+                                    <label class="form-label" for="leagueSport">Sport</label>
+                                    <select class="form-select" id="leagueSport" name="sportId"></select>
+                                    <p class="error-text" data-error-for="sportId"></p>
+                                </div>
+                                <div class="col-md-3 col-lg-4">
+                                    <label class="form-label" for="leagueGender">Category</label>
+                                    <select class="form-select" id="leagueGender" name="gender">
+                                        <option value="">Choose</option>
+                                        <option value="male">Men</option>
+                                        <option value="female">Women</option>
+                                    </select>
+                                    <p class="error-text" data-error-for="gender"></p>
+                                </div>
+                                <div class="col-lg-6">
+                                    <span class="form-label d-block">Teams</span>
+                                    <div id="leagueTeams" class="check-box-list">Choose a sport and category first.</div>
+                                    <p class="error-text" data-error-for="teams"></p>
+                                </div>
+                                <div class="col-lg-6">
+                                    <span class="form-label d-block">Grounds to use</span>
+                                    <div id="leagueGrounds" class="check-box-list">Choose a sport first.</div>
+                                    <p class="error-text" data-error-for="grounds"></p>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <label class="form-label" for="leagueStart">First day</label>
+                                    <input class="form-control" type="date" id="leagueStart" name="startDate">
+                                    <p class="error-text" data-error-for="startDate"></p>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <label class="form-label" for="leagueEnd">Last day</label>
+                                    <input class="form-control" type="date" id="leagueEnd" name="endDate">
+                                    <p class="error-text" data-error-for="endDate"></p>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <label class="form-label" for="leagueFrom">Earliest start</label>
+                                    <input class="form-control" type="time" id="leagueFrom" name="fromTime" value="09:00">
+                                    <p class="error-text" data-error-for="fromTime"></p>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <label class="form-label" for="leagueTo">Latest finish</label>
+                                    <input class="form-control" type="time" id="leagueTo" name="toTime" value="17:00">
+                                    <p class="error-text" data-error-for="toTime"></p>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="panel-foot">
+                            <button class="btn btn-success" type="submit">Make schedule</button>
+                            <button class="btn btn-outline-secondary" type="reset">Clear</button>
+                        </div>
+                    </form>
+
+                    <div id="leaguePreview" class="panel d-none">
+                        <div class="panel-head panel-head-row">
+                            <div>
+                                <h2>Proposed schedule</h2>
+                                <p id="leagueSummary"></p>
+                            </div>
+                            <button type="button" id="saveLeague" class="btn btn-success">Save all matches</button>
+                        </div>
+                        <div class="table-wrap">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead><tr><th>#</th><th>Date</th><th>Time</th><th>Ground</th><th>Match</th></tr></thead>
+                                <tbody id="leagueBody"></tbody>
                             </table>
                         </div>
                     </div>

@@ -171,8 +171,8 @@ export function validatePlayer(fields, players, teams) {
     return errors;
 }
 
-// freeSlots: the time slots of the chosen ground that are still empty on the chosen date
-export function validateMatch(fields, teams, resources, today, matches, freeSlots) {
+// timeIssue: "" when the chosen ground is free at that time, otherwise the reason (from scheduling.js)
+export function validateMatch(fields, teams, resources, today, matches, timeIssue) {
     const errors = {};
     if (!fields.sportId) {
         errors.sportId = "Choose a sport.";
@@ -208,10 +208,10 @@ export function validateMatch(fields, teams, resources, today, matches, freeSlot
         errors.date = "A new match cannot be scheduled in the past.";
     }
     if (!patterns.time.test(fields.time)) {
-        errors.time = "Choose a free time slot.";
-    } else if (!errors.resourceId && !errors.date && !freeSlots.includes(fields.time)) {
-        // the slot is not free any more (someone else booked it)
-        errors.time = "This slot is already booked. Choose another one.";
+        errors.time = "Choose a start time.";
+    } else if (!errors.resourceId && !errors.date && timeIssue) {
+        // outside opening hours, in the past, or another match overlaps
+        errors.time = timeIssue;
     }
 
     // a team can play only one match per day (players need rest)
@@ -241,6 +241,45 @@ export function validateResult(fields, allowedPlayerIds = []) {
     }
     if (!["live", "completed"].includes(fields.status)) {
         errors.status = "Choose live or completed.";
+    }
+    return errors;
+}
+
+// league scheduler form
+export function validateLeague(fields, teamIds, groundIds, today) {
+    const errors = {};
+    if (!isTitle(fields.name, 3, 50)) {
+        errors.name = "Give the league a name of 3 to 50 characters.";
+    }
+    if (!fields.sportId) {
+        errors.sportId = "Choose a sport.";
+    }
+    if (!["male", "female"].includes(fields.gender)) {
+        errors.gender = "Choose men or women.";
+    }
+    if (teamIds.length < 3) {
+        errors.teams = "Tick at least 3 teams for a league.";
+    }
+    if (groundIds.length === 0) {
+        errors.grounds = "Tick at least one ground.";
+    }
+    if (!patterns.date.test(fields.startDate)) {
+        errors.startDate = "Choose the first day.";
+    } else if (fields.startDate < today) {
+        errors.startDate = "The league cannot start in the past.";
+    }
+    if (!patterns.date.test(fields.endDate)) {
+        errors.endDate = "Choose the last day.";
+    } else if (!errors.startDate && fields.endDate < fields.startDate) {
+        errors.endDate = "The last day must be on or after the first day.";
+    }
+    if (!patterns.time.test(fields.fromTime)) {
+        errors.fromTime = "Choose the earliest start time.";
+    }
+    if (!patterns.time.test(fields.toTime)) {
+        errors.toTime = "Choose the latest finish time.";
+    } else if (!errors.fromTime && fields.toTime <= fields.fromTime) {
+        errors.toTime = "Must be after the earliest start time.";
     }
     return errors;
 }

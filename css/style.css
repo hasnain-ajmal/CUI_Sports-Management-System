@@ -557,3 +557,56 @@ summary:focus-visible {
         font-size: 2rem;
     }
 }
+
+/* ---------- match form time check and league scheduler ---------- */
+.time-status {
+    font-size: 0.875rem;
+    padding: 0.55rem 0.8rem;
+    border-radius: 8px;
+    background: var(--gray-100);
+    color: #475569;
+}
+
+.time-status.is-free {
+    background: #ecfdf5;
+    color: var(--green-dark);
+    font-weight: 600;
+}
+
+.time-status.is-busy {
+    background: #fef2f2;
+    color: #b91c1c;
+    font-weight: 600;
+}
+
+/* free times you can click in the match form */
+.slot-pick {
+    cursor: pointer;
+}
+
+.slot-pick:hover,
+.slot-pick.active {
+    background: var(--green);
+    border-color: var(--green);
+    color: #fff;
+}
+
+/* bordered box with tick boxes (league teams and grounds) */
+.check-box-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.35rem 1rem;
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d6dee9;
+    border-radius: 8px;
+    background: #fbfcfe;
+    font-size: 0.9rem;
+    color: var(--gray-500);
+}
+
+.check-box-list .form-check {
+    color: #1e293b;
+    margin: 0;
+}
