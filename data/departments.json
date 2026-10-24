@@ -1,0 +1,7 @@
+[
+    {"id": 1, "name": "Computer Science", "code": "CS"},
+    {"id": 2, "name": "Electrical Engineering", "code": "EE"},
+    {"id": 3, "name": "Management Sciences", "code": "MS"},
+    {"id": 4, "name": "Mathematics", "code": "MTH"},
+    {"id": 5, "name": "Physics", "code": "PHY"}
+]

@@ -1,0 +1,13 @@
+[
+    {"id": 1, "name": "Main Cricket Ground", "category": "Cricket ground", "sportIds": [1], "openTime": "09:00", "closeTime": "19:00", "slotMinutes": 300, "active": true},
+    {"id": 2, "name": "Cricket Ground 2", "category": "Cricket ground", "sportIds": [1], "openTime": "10:00", "closeTime": "18:00", "slotMinutes": 240, "active": true},
+    {"id": 3, "name": "Football Ground", "category": "Football ground", "sportIds": [2], "openTime": "09:30", "closeTime": "19:30", "slotMinutes": 120, "active": true},
+    {"id": 4, "name": "Futsal Ground", "category": "Futsal ground", "sportIds": [7], "openTime": "08:00", "closeTime": "20:00", "slotMinutes": 60, "active": true},
+    {"id": 5, "name": "Volleyball Court", "category": "Court", "sportIds": [3], "openTime": "09:00", "closeTime": "17:00", "slotMinutes": 60, "active": true},
+    {"id": 6, "name": "Basketball Court", "category": "Court", "sportIds": [6], "openTime": "08:00", "closeTime": "18:00", "slotMinutes": 60, "active": true},
+    {"id": 7, "name": "Badminton Court 1", "category": "Badminton court", "sportIds": [4], "openTime": "08:00", "closeTime": "18:00", "slotMinutes": 60, "active": true},
+    {"id": 8, "name": "Badminton Court 2", "category": "Badminton court", "sportIds": [4], "openTime": "08:00", "closeTime": "18:00", "slotMinutes": 60, "active": true},
+    {"id": 9, "name": "Table Tennis Table 1", "category": "Table tennis table", "sportIds": [5], "openTime": "09:00", "closeTime": "17:00", "slotMinutes": 30, "active": true},
+    {"id": 10, "name": "Table Tennis Table 2", "category": "Table tennis table", "sportIds": [5], "openTime": "09:00", "closeTime": "17:00", "slotMinutes": 30, "active": true},
+    {"id": 11, "name": "Table Tennis Table 3", "category": "Table tennis table", "sportIds": [5], "openTime": "09:00", "closeTime": "17:00", "slotMinutes": 30, "active": true}
+]

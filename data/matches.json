@@ -1,0 +1,14 @@
+[
+    {"id": 1, "sportId": 1, "gender": "male", "teamA": 1, "teamB": 2, "date": "2026-10-20", "time": "09:00", "status": "completed", "scoreA": 152, "scoreB": 140, "playerOfMatch": 1, "resourceId": 1, "createdBy": 1},
+    {"id": 2, "sportId": 1, "gender": "male", "teamA": 3, "teamB": 4, "date": "2026-10-20", "time": "14:00", "status": "completed", "scoreA": 120, "scoreB": 128, "playerOfMatch": 7, "resourceId": 1, "createdBy": 1},
+    {"id": 3, "sportId": 1, "gender": "male", "teamA": 1, "teamB": 3, "date": "2026-10-21", "time": "09:00", "status": "completed", "scoreA": 165, "scoreB": 131, "playerOfMatch": 3, "resourceId": 1, "createdBy": 1},
+    {"id": 4, "sportId": 1, "gender": "male", "teamA": 2, "teamB": 4, "date": "2026-10-21", "time": "14:00", "status": "completed", "scoreA": 144, "scoreB": 144, "playerOfMatch": null, "resourceId": 1, "createdBy": 1},
+    {"id": 5, "sportId": 1, "gender": "female", "teamA": 5, "teamB": 6, "date": "2026-10-22", "time": "10:00", "status": "completed", "scoreA": 98, "scoreB": 85, "playerOfMatch": 9, "resourceId": 2, "createdBy": 1},
+    {"id": 6, "sportId": 2, "gender": "male", "teamA": 8, "teamB": 9, "date": "2026-10-22", "time": "15:30", "status": "completed", "scoreA": 2, "scoreB": 1, "playerOfMatch": 12, "resourceId": 3, "createdBy": 1},
+    {"id": 7, "sportId": 2, "gender": "male", "teamA": 9, "teamB": 10, "date": "2026-10-23", "time": "15:30", "status": "completed", "scoreA": 0, "scoreB": 0, "playerOfMatch": null, "resourceId": 3, "createdBy": 1},
+    {"id": 8, "sportId": 3, "gender": "female", "teamA": 11, "teamB": 12, "date": "2026-10-24", "time": "11:00", "status": "live", "scoreA": 1, "scoreB": 1, "playerOfMatch": null, "resourceId": 5, "createdBy": 1},
+    {"id": 9, "sportId": 1, "gender": "male", "teamA": 1, "teamB": 4, "date": "2026-10-25", "time": "09:00", "status": "upcoming", "scoreA": null, "scoreB": null, "playerOfMatch": null, "resourceId": 1, "createdBy": 1},
+    {"id": 10, "sportId": 1, "gender": "female", "teamA": 6, "teamB": 7, "date": "2026-10-25", "time": "10:00", "status": "upcoming", "scoreA": null, "scoreB": null, "playerOfMatch": null, "resourceId": 2, "createdBy": 1},
+    {"id": 11, "sportId": 2, "gender": "male", "teamA": 8, "teamB": 10, "date": "2026-10-26", "time": "15:30", "status": "upcoming", "scoreA": null, "scoreB": null, "playerOfMatch": null, "resourceId": 3, "createdBy": 1},
+    {"id": 12, "sportId": 1, "gender": "male", "teamA": 2, "teamB": 3, "date": "2026-10-27", "time": "09:00", "status": "upcoming", "scoreA": null, "scoreB": null, "playerOfMatch": null, "resourceId": 1, "createdBy": 1}
+]

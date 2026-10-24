@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Departmental teams, players and sports coordinators.">
+    <title>Teams | CUI Sports</title>
+    <!-- Tailwind CSS (CDN) is used for all public pages -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/nav.js" defer></script>
+</head>
+<body class="bg-slate-50 text-slate-800">
+    <header class="bg-[#0b1f3a] text-white sticky top-0 z-50 shadow-lg">
+        <nav class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between relative" aria-label="Main">
+            <a href="index.html" class="flex items-center gap-2 font-bold text-lg">
+                <span class="w-9 h-9 rounded-lg bg-emerald-500 grid place-items-center text-sm">CUI</span>
+                <span>Sports Management</span>
+            </a>
+            <button id="menuButton" class="md:hidden p-2 rounded hover:bg-white/10" aria-expanded="false" aria-controls="menu" aria-label="Open menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <ul id="menu" class="hidden md:flex absolute md:static top-16 left-0 right-0 bg-[#0b1f3a] md:bg-transparent flex-col md:flex-row gap-1 md:gap-6 p-4 md:p-0 text-slate-300 shadow-lg md:shadow-none">
+                <li><a class="nav-link-public block py-2 hover:text-white" href="index.html">Home</a></li>
+                <li><a class="nav-link-public block py-2 hover:text-white" href="matches.html">Matches</a></li>
+                <li><a class="nav-link-public block py-2 hover:text-white" href="standings.html">Standings</a></li>
+                <li><a class="nav-link-public block py-2 hover:text-white" href="teams.html">Teams</a></li>
+                <li><a id="authLink" class="block py-2 px-4 rounded-lg bg-emerald-500 text-white font-semibold hover:bg-emerald-600 text-center" href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-10 w-full">
+        <h1 class="text-3xl font-bold">Teams and players</h1>
+        <p class="text-slate-600 mt-1 mb-6">Every department has separate men's and women's teams. Open a team to see its players.</p>
+        <p id="pageError" class="hidden bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 mb-6" role="alert"></p>
+
+        <form id="teamFilter" class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 grid gap-4 sm:grid-cols-3 mb-6" role="search">
+            <div>
+                <label for="teamDept" class="block text-sm font-medium mb-1">Department</label>
+                <select id="teamDept" class="w-full border border-slate-300 rounded-lg p-2"></select>
+            </div>
+            <div>
+                <label for="teamSport" class="block text-sm font-medium mb-1">Sport</label>
+                <select id="teamSport" class="w-full border border-slate-300 rounded-lg p-2"></select>
+            </div>
+            <div>
+                <label for="teamGender" class="block text-sm font-medium mb-1">Category</label>
+                <select id="teamGender" class="w-full border border-slate-300 rounded-lg p-2">
+                    <option value="">Men and women</option>
+                    <option value="male">Men</option>
+                    <option value="female">Women</option>
+                </select>
+            </div>
+        </form>
+        <div id="teamList" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+
+        <section id="players" class="mt-12 scroll-mt-20">
+            <h2 class="text-2xl font-bold">Find a player</h2>
+            <p class="text-slate-600 mt-1 mb-4">Type a name and click it to see the player's full record.</p>
+            <label for="playerSearch" class="sr-only">Search players</label>
+            <input id="playerSearch" type="search" placeholder="Search by name, e.g. Ali" maxlength="40" class="w-full sm:w-96 border border-slate-300 rounded-lg p-2 mb-4 bg-white">
+            <ul id="playerList" class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3"></ul>
+        </section>
+
+        <section id="coordinators" class="mt-12 scroll-mt-20">
+            <h2 class="text-2xl font-bold">Sports coordinators</h2>
+            <p class="text-slate-600 mt-1 mb-4">Each department has three: a faculty member who looks after all its teams, a male student for the men's teams and a female student for the women's teams.</p>
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 table-wrap">
+                <table class="w-full text-sm">
+                    <thead class="bg-slate-100 text-slate-600 text-left">
+                        <tr>
+                            <th scope="col" class="p-3">Department</th>
+                            <th scope="col" class="p-3">Code</th>
+                            <th scope="col" class="p-3">Faculty coordinator</th>
+                            <th scope="col" class="p-3">Student (male)</th>
+                            <th scope="col" class="p-3">Student (female)</th>
+                            <th scope="col" class="p-3">Teams</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deptBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-[#0b1f3a] text-slate-300 mt-12">
+        <div class="site-footer max-w-6xl mx-auto px-4 py-6 text-sm">
+            <p>&copy; <time datetime="2026">2026</time> University Sports Management System, COMSATS University Islamabad</p>
+            <p>Web Technologies midterm project: Muhammad Hasnain Ajmal (FA24-BSE-055), Muhammad Sohail (FA24-BSE-105)</p>
+        </div>
+    </footer>
+
+    <script type="module" src="js/teams.js"></script>
+</body>
+</html>

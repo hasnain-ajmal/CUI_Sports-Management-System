@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="All fixtures and results of the sports week.">
+    <title>Matches | CUI Sports</title>
+    <!-- Tailwind CSS (CDN) is used for all public pages -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/nav.js" defer></script>
+</head>
+<body class="bg-slate-50 text-slate-800">
+    <header class="bg-[#0b1f3a] text-white sticky top-0 z-50 shadow-lg">
+        <nav class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between relative" aria-label="Main">
+            <a href="index.html" class="flex items-center gap-2 font-bold text-lg">
+                <span class="w-9 h-9 rounded-lg bg-emerald-500 grid place-items-center text-sm">CUI</span>
+                <span>Sports Management</span>
+            </a>
+            <button id="menuButton" class="md:hidden p-2 rounded hover:bg-white/10" aria-expanded="false" aria-controls="menu" aria-label="Open menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <ul id="menu" class="hidden md:flex absolute md:static top-16 left-0 right-0 bg-[#0b1f3a] md:bg-transparent flex-col md:flex-row gap-1 md:gap-6 p-4 md:p-0 text-slate-300 shadow-lg md:shadow-none">
+                <li><a class="nav-link-public block py-2 hover:text-white" href="index.html">Home</a></li>
+                <li><a class="nav-link-public block py-2 hover:text-white" href="matches.html">Matches</a></li>
+                <li><a class="nav-link-public block py-2 hover:text-white" href="standings.html">Standings</a></li>
+                <li><a class="nav-link-public block py-2 hover:text-white" href="teams.html">Teams</a></li>
+                <li><a id="authLink" class="block py-2 px-4 rounded-lg bg-emerald-500 text-white font-semibold hover:bg-emerald-600 text-center" href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-10 w-full">
+        <h1 class="text-3xl font-bold">Matches</h1>
+        <p class="text-slate-600 mt-1 mb-6">Fixtures and results of every sport. Use the filters to find a match.</p>
+        <p id="pageError" class="hidden bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 mb-6" role="alert"></p>
+
+        <form id="filterForm" class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6" role="search">
+            <div>
+                <label for="filterSport" class="block text-sm font-medium mb-1">Sport</label>
+                <select id="filterSport" class="w-full border border-slate-300 rounded-lg p-2"></select>
+            </div>
+            <div>
+                <label for="filterGender" class="block text-sm font-medium mb-1">Category</label>
+                <select id="filterGender" class="w-full border border-slate-300 rounded-lg p-2">
+                    <option value="">Men and women</option>
+                    <option value="male">Men</option>
+                    <option value="female">Women</option>
+                </select>
+            </div>
+            <div>
+                <label for="filterStatus" class="block text-sm font-medium mb-1">Status</label>
+                <select id="filterStatus" class="w-full border border-slate-300 rounded-lg p-2">
+                    <option value="">All</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="live">Live</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+            <div>
+                <label for="search" class="block text-sm font-medium mb-1">Search team</label>
+                <input id="search" type="search" placeholder="e.g. CS" maxlength="40" class="w-full border border-slate-300 rounded-lg p-2">
+            </div>
+        </form>
+
+        <p id="matchCount" class="text-sm text-slate-500 mb-3" aria-live="polite"></p>
+        <div id="matchList" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+    </main>
+
+    <footer class="bg-[#0b1f3a] text-slate-300 mt-12">
+        <div class="site-footer max-w-6xl mx-auto px-4 py-6 text-sm">
+            <p>&copy; <time datetime="2026">2026</time> University Sports Management System, COMSATS University Islamabad</p>
+            <p>Web Technologies midterm project: Muhammad Hasnain Ajmal (FA24-BSE-055), Muhammad Sohail (FA24-BSE-105)</p>
+        </div>
+    </footer>
+
+    <script type="module" src="js/matches.js"></script>
+</body>
+</html>

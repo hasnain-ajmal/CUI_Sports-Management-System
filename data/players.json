@@ -1,0 +1,18 @@
+[
+    { "id": 1, "name": "Saad Hussain", "regNo": "FA24-BSE-012", "gender": "male", "departmentId": 1, "teamId": 1, "role": "Captain" },
+    { "id": 2, "name": "Ahmed Nawaz", "regNo": "FA24-BCS-031", "gender": "male", "departmentId": 1, "teamId": 1, "role": "Player" },
+    { "id": 3, "name": "Umar Farooq", "regNo": "SP24-BSE-044", "gender": "male", "departmentId": 1, "teamId": 1, "role": "Vice Captain" },
+    { "id": 4, "name": "Danish Ali", "regNo": "FA23-BEE-007", "gender": "male", "departmentId": 2, "teamId": 2, "role": "Captain" },
+    { "id": 5, "name": "Kamran Akmal", "regNo": "FA24-BEE-019", "gender": "male", "departmentId": 2, "teamId": 2, "role": "Player" },
+    { "id": 6, "name": "Faizan Khan", "regNo": "FA23-BBA-021", "gender": "male", "departmentId": 3, "teamId": 3, "role": "Captain" },
+    { "id": 7, "name": "Owais Qureshi", "regNo": "SP23-BSM-003", "gender": "male", "departmentId": 4, "teamId": 4, "role": "Captain" },
+    { "id": 8, "name": "Zoya Ahmed", "regNo": "FA24-BCS-055", "gender": "female", "departmentId": 1, "teamId": 5, "role": "Captain" },
+    { "id": 9, "name": "Areeba Zafar", "regNo": "FA25-BSE-010", "gender": "female", "departmentId": 1, "teamId": 5, "role": "Player" },
+    { "id": 10, "name": "Laiba Hassan", "regNo": "FA24-BEE-061", "gender": "female", "departmentId": 2, "teamId": 6, "role": "Captain" },
+    { "id": 11, "name": "Iqra Saleem", "regNo": "SP24-BBA-018", "gender": "female", "departmentId": 3, "teamId": 7, "role": "Captain" },
+    { "id": 12, "name": "Hassan Mirza", "regNo": "FA23-BCS-090", "gender": "male", "departmentId": 1, "teamId": 8, "role": "Captain" },
+    { "id": 13, "name": "Talha Butt", "regNo": "FA24-BEE-033", "gender": "male", "departmentId": 2, "teamId": 9, "role": "Captain" },
+    { "id": 14, "name": "Arslan Nadeem", "regNo": "FA24-BPH-005", "gender": "male", "departmentId": 5, "teamId": 10, "role": "Captain" },
+    { "id": 15, "name": "Mahnoor Ali", "regNo": "FA24-BSE-077", "gender": "female", "departmentId": 1, "teamId": 11, "role": "Captain" },
+    { "id": 16, "name": "Rida Fatima", "regNo": "SP25-BSM-014", "gender": "female", "departmentId": 4, "teamId": 12, "role": "Captain" }
+]

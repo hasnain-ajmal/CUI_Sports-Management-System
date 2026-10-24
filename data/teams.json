@@ -1,0 +1,14 @@
+[
+    { "id": 1, "name": "CS Cricket (Men)", "departmentId": 1, "sportId": 1, "gender": "male", "captain": "Saad Hussain" },
+    { "id": 2, "name": "EE Cricket (Men)", "departmentId": 2, "sportId": 1, "gender": "male", "captain": "Danish Ali" },
+    { "id": 3, "name": "MS Cricket (Men)", "departmentId": 3, "sportId": 1, "gender": "male", "captain": "Faizan Khan" },
+    { "id": 4, "name": "MTH Cricket (Men)", "departmentId": 4, "sportId": 1, "gender": "male", "captain": "Owais Qureshi" },
+    { "id": 5, "name": "CS Cricket (Women)", "departmentId": 1, "sportId": 1, "gender": "female", "captain": "Zoya Ahmed" },
+    { "id": 6, "name": "EE Cricket (Women)", "departmentId": 2, "sportId": 1, "gender": "female", "captain": "Laiba Hassan" },
+    { "id": 7, "name": "MS Cricket (Women)", "departmentId": 3, "sportId": 1, "gender": "female", "captain": "Iqra Saleem" },
+    { "id": 8, "name": "CS Football (Men)", "departmentId": 1, "sportId": 2, "gender": "male", "captain": "Hassan Mirza" },
+    { "id": 9, "name": "EE Football (Men)", "departmentId": 2, "sportId": 2, "gender": "male", "captain": "Talha Butt" },
+    { "id": 10, "name": "PHY Football (Men)", "departmentId": 5, "sportId": 2, "gender": "male", "captain": "Arslan Nadeem" },
+    { "id": 11, "name": "CS Volleyball (Women)", "departmentId": 1, "sportId": 3, "gender": "female", "captain": "Mahnoor Ali" },
+    { "id": 12, "name": "MTH Volleyball (Women)", "departmentId": 4, "sportId": 3, "gender": "female", "captain": "Rida Fatima" }
+]

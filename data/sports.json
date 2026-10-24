@@ -1,0 +1,9 @@
+[
+    {"id": 1, "name": "Cricket", "type": "team", "active": true},
+    {"id": 2, "name": "Football", "type": "team", "active": true},
+    {"id": 3, "name": "Volleyball", "type": "team", "active": true},
+    {"id": 4, "name": "Badminton", "type": "individual", "active": true},
+    {"id": 5, "name": "Table Tennis", "type": "individual", "active": false},
+    {"id": 6, "name": "Basketball", "type": "team", "active": true},
+    {"id": 7, "name": "Futsal", "type": "team", "active": true}
+]

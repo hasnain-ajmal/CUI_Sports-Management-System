@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | CUI Sports</title>
+    <!-- Bootstrap 5 (CDN) is used for the whole dashboard: grid, forms, tables, modals and toast -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- go to the login page before anything shows, if nobody is logged in -->
+    <script>
+        if (!sessionStorage.getItem("usms-user")) {
+            location.replace("login.html");
+        }
+    </script>
+</head>
+<body class="dashboard-body">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- sidebar: buttons with data-role="admin" are hidden for coordinators -->
+            <nav class="col-md-3 col-lg-2 admin-sidebar p-3" aria-label="Dashboard sections">
+                <a href="index.html" class="d-flex align-items-center gap-2 text-white text-decoration-none mb-1">
+                    <span class="rounded bg-success fw-bold px-2 py-1 small">CUI</span>
+                    <span class="fw-semibold" id="portalName">Sports Admin</span>
+                </a>
+                <p class="small text-secondary mb-3" id="portalScope"></p>
+                <div id="sectionNav" class="nav flex-md-column nav-pills gap-1">
+                    <button class="nav-link active" data-section="overview">Overview</button>
+                    <button class="nav-link" data-section="departments" data-role="admin">Departments</button>
+                    <button class="nav-link" data-section="coordinators" data-role="admin">Coordinators</button>
+                    <button class="nav-link" data-section="sports" data-role="admin">Sports</button>
+                    <button class="nav-link" data-section="resources">Grounds &amp; slots</button>
+                    <button class="nav-link" data-section="teams">Teams</button>
+                    <button class="nav-link" data-section="players">Players</button>
+                    <button class="nav-link" data-section="matches">Matches &amp; results</button>
+                    <button class="nav-link" data-section="announcements">Announcements</button>
+                </div>
+                <hr class="border-secondary">
+                <p class="text-secondary small mb-2">Logged in as <span id="userName" class="text-white"></span></p>
+                <div class="d-flex flex-md-column gap-2 flex-wrap">
+                    <a href="index.html" class="btn btn-outline-light btn-sm">View website</a>
+                    <button id="resetButton" class="btn btn-outline-warning btn-sm" data-role="admin">Reset demo data</button>
+                    <button id="logoutButton" class="btn btn-danger btn-sm">Log out</button>
+                </div>
+            </nav>
+
+            <main class="col-md-9 col-lg-10 p-3 p-md-4">
+                <div id="pageError" class="alert alert-danger d-none" role="alert"></div>
+
+                <!-- ================= OVERVIEW ================= -->
+                <section id="overview" class="admin-section">
+                    <header class="section-head">
+                        <h1>Overview</h1>
+                        <p id="overviewText"></p>
+                    </header>
+                    <div id="overviewStats" class="stat-grid mb-4"></div>
+                    <div class="row g-4">
+                        <div class="col-lg-6" data-role="admin">
+                            <div class="panel h-100">
+                                <div class="panel-head">
+                                    <h2>Results to enter</h2>
+                                    <p>Matches whose date has passed but are not completed.</p>
+                                </div>
+                                <ul id="pendingList" class="list-group list-group-flush"></ul>
+                            </div>
+                        </div>
+                        <div class="col-lg-6" id="nextCol">
+                            <div class="panel h-100">
+                                <div class="panel-head">
+                                    <h2 id="nextTitle">Next matches</h2>
+                                    <p>The next five matches on the schedule.</p>
+                                </div>
+                                <ul id="nextList" class="list-group list-group-flush"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= DEPARTMENTS (admin) ================= -->
+                <section id="departments" class="admin-section d-none">
+                    <header class="section-head">
+                        <h1>Departments</h1>
+                        <p>Departments taking part in the sports week. Add their coordinators in the Coordinators section.</p>
+                    </header>
+                    <form id="departmentForm" class="panel mb-4" novalidate>
+                        <div class="panel-head">
+                            <h2>Add department</h2>
+                            <p>Name and short code, e.g. Computer Science and CS.</p>
+                        </div>
+                        <fieldset class="panel-body">
+                            <legend class="visually-hidden">Department details</legend>
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <label class="form-label" for="deptName">Department name</label>
+                                    <input class="form-control" id="deptName" name="name" maxlength="60" placeholder="Computer Science">
+                                    <p class="error-text" data-error-for="name"></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="deptCode">Code</label>
+                                    <input class="form-control text-uppercase" id="deptCode" name="code" maxlength="5" placeholder="CS">
+                                    <p class="error-text" data-error-for="code"></p>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="panel-foot">
+                            <button class="btn btn-success" type="submit">Add department</button>
+                            <button class="btn btn-outline-secondary" type="reset">Clear</button>
+                        </div>
+                    </form>
+                    <div class="panel">
+                        <div class="panel-head panel-head-row"><h2>All departments</h2><span class="count" id="departmentCount"></span></div>
+                        <div class="table-wrap">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead><tr><th>Name</th><th>Code</th><th>Faculty coordinator</th><th>Student (male)</th><th>Student (female)</th><th>Teams</th><th class="text-end">Action</th></tr></thead>
+                                <tbody id="departmentBody" data-list="departments"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= COORDINATORS (admin) ================= -->
+                <section id="coordinators" class="admin-section d-none">
+                    <header class="section-head">
+                        <h1>Coordinators</h1>
+                        <p>Every department has three sports coordinators: one faculty member (male or female) who looks after all its teams, and two students, a male one for the men's teams and a female one for the women's teams. Creating a coordinator makes their login.</p>
+                    </header>
+                    <form id="coordinatorForm" class="panel mb-4" novalidate>
+                        <div class="panel-head">
+                            <h2>Add coordinator and create login</h2>
+                            <p>The username and password are shown once, so you can send them to the coordinator.</p>
+                        </div>
+                        <fieldset class="panel-body">
+                            <legend class="visually-hidden">Coordinator details</legend>
+                            <div class="row g-3">
+                                <div class="col-md-6 col-lg-3">
+                                    <label class="form-label" for="coordDepartment">Department</label>
+                                    <select class="form-select" id="coordDepartment" name="departmentId"></select>
+                                    <p class="error-text" data-error-for="departmentId"></p>
+                                </div>
+                                <div class="col-md-6 col-lg-3">
+                                    <label class="form-label" for="coordType">Coordinator type</label>
+                                    <select class="form-select" id="coordType" name="type">
+                                        <option value="">Choose</option>
+                                        <option value="faculty">Faculty member</option>
+                                        <option value="student">Student</option>
+                                    </select>
+                                    <p class="error-text" data-error-for="type"></p>
+                                </div>
+                                <div class="col-md-6 col-lg-2">
+                                    <label class="form-label" for="coordGender">Gender</label>
+                                    <select class="form-select" id="coordGender" name="gender">
+                                        <option value="">Choose</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                    </select>
+                                    <p class="error-text" data-error-for="gender"></p>
+                                </div>
+                                <div class="col-md-6 col-lg-4">
+                                    <label class="form-label" for="coordName">Full name</label>
+                                    <input class="form-control" id="coordName" name="name" maxlength="40" placeholder="Dr. Imran Shah">
+                                    <p class="error-text" data-error-for="name"></p>
+                                </div>
+                            </div>
+                            <p class="small text-secondary mb-0">Student coordinators manage only their own gender's teams; the faculty coordinator manages both.</p>
+                        </fieldset>
+                        <div class="panel-foot">
+                            <button class="btn btn-success" type="submit">Create coordinator login</button>
+                            <button class="btn btn-outline-secondary" type="reset">Clear</button>
+                        </div>
+                    </form>
+                    <div class="panel">
+                        <div class="panel-head panel-head-row"><h2>Coordinator accounts</h2><span class="count" id="coordinatorCount"></span></div>
+                        <div class="table-wrap">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead><tr><th>Department</th><th>Role</th><th>Name</th><th>Username</th><th>Manages</th><th class="text-end">Action</th></tr></thead>
+                                <tbody id="coordinatorBody" data-list="users"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= SPORTS (admin) ================= -->
+                <section id="sports" class="admin-section d-none">
+                    <header class="section-head">
+                        <h1>Sports</h1>
+                        <p>Sports offered this season. Inactive sports are hidden from the forms.</p>
+                    </header>
+                    <form id="sportForm" class="panel mb-4" novalidate>
+                        <div class="panel-head">
+                            <h2>Add sport</h2>
+                            <p>Team sports have squads; individual sports include doubles.</p>
+                        </div>
+                        <fieldset class="panel-body">
+                            <legend class="visually-hidden">Sport details</legend>
+                            <div class="row g-3 align-items-start">
+                                <div class="col-md-5">
+                                    <label class="form-label" for="sportName">Sport name</label>
+                                    <input class="form-control" id="sportName" name="name" maxlength="30" placeholder="Hockey">
+                                    <p class="error-text" data-error-for="name"></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="sportType">Type</label>
+                                    <select class="form-select" id="sportType" name="type">
+                                        <option value="">Choose type</option>
+                                        <option value="team">Team sport</option>
+                                        <option value="individual">Individual / doubles</option>
+                                    </select>
+                                    <p class="error-text" data-error-for="type"></p>
+                                </div>
+                                <div class="col-md-3 pt-md-4">
+                                    <div class="form-check mt-md-2">
+                                        <input class="form-check-input" type="checkbox" id="sportActive" name="active" checked>
+                                        <label class="form-check-label" for="sportActive">Active this season</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="panel-foot">
+                            <button class="btn btn-success" type="submit">Add sport</button>
+                            <button class="btn btn-outline-secondary" type="reset">Clear</button>
+                        </div>
+                    </form>
+                    <div class="panel">
+                        <div class="panel-head panel-head-row"><h2>All sports</h2><span class="count" id="sportCount"></span></div>
+                        <div class="table-wrap">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead><tr><th>Name</th><th>Type</th><th>Teams</th><th>Grounds / courts</th><th>Status</th><th class="text-end">Action</th></tr></thead>
+                                <tbody id="sportBody" data-list="sports"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= GROUNDS & SLOTS ================= -->
+                <section id="resources" class="admin-section d-none">
+                    <header class="section-head">
+                        <h1>Grounds &amp; slots</h1>
+                        <p>Every ground, court and table of the university, and which time slots are free on a day. Matches can only be booked into a free slot.</p>
+                    </header>
+
+                    <div class="panel mb-4">
+                        <div class="panel-head panel-head-row">
+                            <div>
+                                <h2>Free and booked slots</h2>
+                                <p>Green slots are free; red ones already have a match.</p>
+                            </div>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <div>
+                                    <label class="form-label small mb-1" for="slotDate">Date</label>
+                                    <input type="date" id="slotDate" class="form-control form-control-sm">
+                                </div>
+                                <div>
+                                    <label class="form-label small mb-1" for="slotCategory">Category</label>
+                                    <select id="slotCategory" class="form-select form-select-sm"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="availabilityList" class="panel-body availability"></div>
+                    </div>
+
+                    <form id="resourceForm" class="panel mb-4" novalidate data-role="admin">
+                        <div class="panel-head">
+                            <h2>Add ground, court or table</h2>
+                            <p>Add several of the same kind at once: "Badminton Court" with 3 makes Badminton Court 1, 2 and 3.</p>
+                        </div>
+                        <fieldset class="panel-body">
+                            <legend class="visually-hidden">Ground details</legend>
+                            <div class="row g-3">
+                                <div class="col-md-5">
+                                    <label class="form-label" for="resName">Name</label>
+                                    <input class="form-control" id="resName" name="name" maxlength="40" placeholder="Badminton Court">
+                                    <p class="error-text" data-error-for="name"></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="resCategory">Category</label>
+                                    <input class="form-control" id="resCategory" name="category" maxlength="30" list="categoryList" placeholder="Badminton court">
+                                    <datalist id="categoryList"></datalist>
+                                    <p class="error-text" data-error-for="category"></p>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label" for="resCount">How many</label>
+                                    <input class="form-control" type="number" id="resCount" name="count" min="1" max="10" value="1">
+                                    <p class="error-text" data-error-for="count"></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="resOpen">Opens at</label>
+                                    <input class="form-control" type="time" id="resOpen" name="openTime" value="08:00">
+                                    <p class="error-text" data-error-for="openTime"></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="resClose">Closes at</label>
+                                    <input class="form-control" type="time" id="resClose" name="closeTime" value="18:00">
+                                    <p class="error-text" data-error-for="closeTime"></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="resSlot">Length of one slot</label>
+                                    <select class="form-select" id="resSlot" name="slotMinutes">
+                                        <option value="30">30 minutes</option>
+                                        <option value="45">45 minutes</option>
+                                        <option value="60" selected>1 hour</option>
+                                        <option value="90">1.5 hours</option>
+                                        <option value="120">2 hours</option>
+                                        <option value="180">3 hours</option>
+                                        <option value="240">4 hours</option>
+                                        <option value="300">5 hours</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <span class="form-label d-block">Sports that can be played here</span>
+                                    <div id="resSports" class="d-flex flex-wrap gap-3"></div>
+                                    <p class="error-text" data-error-for="sports"></p>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="panel-foot">
+                            <button class="btn btn-success" type="submit">Add</button>
+                            <button class="btn btn-outline-secondary" type="reset">Clear</button>
+                        </div>
+                    </form>
+
+                    <div class="panel">
+                        <div class="panel-head panel-head-row"><h2>All grounds, courts and tables</h2><span class="count" id="resourceCount"></span></div>
+                        <div class="table-wrap">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead><tr><th>Name</th><th>Category</th><th>Sports</th><th>Open</th><th>Slots / day</th><th>Status</th><th class="text-end">Action</th></tr></thead>
+                                <tbody id="resourceBody" data-list="resources"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= TEAMS ================= -->
+                <section id="teams" class="admin-section d-none">
+                    <header class="section-head">
+                        <h1>Teams</h1>
+                        <p id="teamsText">One team per department, per sport, per category.</p>
+                    </header>
+                    <form id="teamForm" class="panel mb-4" novalidate>
+                        <div class="panel-head">
+                            <h2>Add team</h2>
+                            <p>The name is made automatically, e.g. "CS Cricket (Men)".</p>
+                        </div>
+                        <fieldset class="panel-body">
+                            <legend class="visually-hidden">Team details</legend>
+                            <div class="row g-3">
+                                <div class="col-md-6 col-lg-3">
+                                    <label class="form-label" for="teamDepartment">Department</label>
+                                    <select class="form-select" id="teamDepartment" name="departmentId"></select>
+                                    <p class="error-text" data-error-for="departmentId"></p>
+                                </div>
+                                <div class="col-md-6 col-lg-3">
+                                    <label class="form-label" for="teamSportSelect">Sport</label>
+                                    <select class="form-select" id="teamSportSelect" name="sportId"></select>
+                                    <p class="error-text" data-error-for="sportId"></p>
+                                </div>
+                                <div class="col-md-6 col-lg-2">
+                                    <label class="form-label" for="teamGenderSelect">Category</label>
+                                    <select class="form-select gender-select" id="teamGenderSelect" name="gender"></select>
+                                    <p class="error-text" data-error-for="gender"></p>
+                                </div>
+                                <div class="col-md-6 col-lg-4">
+                                    <label class="form-label" for="teamCaptain">Captain</label>
+                                    <input class="form-control" id="teamCaptain" name="captain" maxlength="40">
+                                    <p class="error-text" data-error-for="captain"></p>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="panel-foot">
+                            <button class="btn btn-success" type="submit">Add team</button>
+                            <button class="btn btn-outline-secondary" type="reset">Clear</button>
+                        </div>
+                    </form>
+                    <div class="panel">
+                        <div class="panel-head panel-head-row"><h2 id="teamTableTitle">All teams</h2><span class="count" id="teamCount"></span></div>
+                        <div class="table-wrap">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead><tr><th>Team</th><th>Department</th><th>Sport</th><th>Category</th><th>Captain</th><th>Players</th><th class="text-end">Action</th></tr></thead>
+                                <tbody id="teamBody" data-list="teams"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= PLAYERS ================= -->
+                <section id="players" class="admin-section d-none">
+                    <header class="section-head">
+                        <h1>Players</h1>
+                        <p>Choosing "Captain" as the role also makes the player the team's captain.</p>
+                    </header>
+                    <form id="playerForm" class="panel mb-4" novalidate>
+                        <div class="panel-head">
+                            <h2>Add player</h2>
+                            <p>A player can only join a team of their own department and gender.</p>
+                        </div>
+                        <fieldset class="panel-body">
+                            <legend class="visually-hidden">Player details</legend>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label" for="playerName">Full name</label>
+                                    <input class="form-control" id="playerName" name="name" maxlength="40">
+                                    <p class="error-text" data-error-for="name"></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="playerRegNo">Registration no.</label>
+                                    <input class="form-control text-uppercase" id="playerRegNo" name="regNo" maxlength="12" placeholder="FA24-BSE-105">
+                                    <p class="error-text" data-error-for="regNo"></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="playerGender">Gender</label>
+                                    <select class="form-select gender-select" id="playerGender" name="gender"></select>
+                                    <p class="error-text" data-error-for="gender"></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="playerDepartment">Department</label>
+                                    <select class="form-select" id="playerDepartment" name="departmentId"></select>
+                                    <p class="error-text" data-error-for="departmentId"></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="playerTeam">Team</label>
+                                    <select class="form-select" id="playerTeam" name="teamId"></select>
+                                    <p class="error-text" data-error-for="teamId"></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="playerRole">Role</label>
+                                    <select class="form-select" id="playerRole" name="role">
+                                        <option>Player</option>
+                                        <option>Vice Captain</option>
+                                        <option>Captain</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="panel-foot">
+                            <button class="btn btn-success" type="submit">Add player</button>
+                            <button class="btn btn-outline-secondary" type="reset">Clear</button>
+                        </div>
+                    </form>
+                    <div class="panel">
+                        <div class="panel-head panel-head-row">
+                            <h2>Players</h2>
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="visually-hidden" for="playerSearch">Search players</label>
+                                <input id="playerSearch" type="search" class="form-control form-control-sm" placeholder="Search name or reg. no." maxlength="40">
+                                <span class="count" id="playerCount"></span>
+                            </div>
+                        </div>
+                        <div class="table-wrap">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead><tr><th>Name</th><th>Reg. no.</th><th>Department</th><th>Team</th><th>Role</th><th class="text-end">Action</th></tr></thead>
+                                <tbody id="playerBody" data-list="players"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= MATCHES ================= -->
+                <section id="matches" class="admin-section d-none">
+                    <header class="section-head">
+                        <h1>Matches &amp; results</h1>
+                        <p id="matchesText">Pick the teams, then a ground and one of its free slots.</p>
+                    </header>
+                    <form id="matchForm" class="panel mb-4" novalidate>
+                        <div class="panel-head">
+                            <h2>Schedule a match</h2>
+                            <p>Only grounds that suit the sport, and only their free slots, are offered.</p>
+                        </div>
+                        <fieldset class="panel-body">
+                            <legend class="visually-hidden">Match details</legend>
+                            <div class="row g-3">
+                                <div class="col-md-6 col-lg-3">
+                                    <label class="form-label" for="matchSport">Sport</label>
+                                    <select class="form-select" id="matchSport" name="sportId"></select>
+                                    <p class="error-text" data-error-for="sportId"></p>
+                                </div>
+                                <div class="col-md-6 col-lg-3">
+                                    <label class="form-label" for="matchGender">Category</label>
+                                    <select class="form-select gender-select" id="matchGender" name="gender"></select>
+                                    <p class="error-text" data-error-for="gender"></p>
+                                </div>
+                                <div class="col-md-6 col-lg-3">
+                                    <label class="form-label" for="matchTeamA">Team A</label>
+                                    <select class="form-select" id="matchTeamA" name="teamA"></select>
+                                    <p class="error-text" data-error-for="teamA"></p>
+                                </div>
+                                <div class="col-md-6 col-lg-3">
+                                    <label class="form-label" for="matchTeamB">Team B</label>
+                                    <select class="form-select" id="matchTeamB" name="teamB"></select>
+                                    <p class="error-text" data-error-for="teamB"></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="matchResource">Ground / court</label>
+                                    <select class="form-select" id="matchResource" name="resourceId"></select>
+                                    <p class="error-text" data-error-for="resourceId"></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="matchDate">Date</label>
+                                    <input class="form-control" type="date" id="matchDate" name="date">
+                                    <p class="error-text" data-error-for="date"></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="matchTime">Free time slot</label>
+                                    <select class="form-select" id="matchTime" name="time"></select>
+                                    <p class="error-text" data-error-for="time"></p>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="panel-foot">
+                            <button class="btn btn-success" type="submit">Schedule match</button>
+                            <button class="btn btn-outline-secondary" type="reset">Clear</button>
+                        </div>
+                    </form>
+                    <div class="panel">
+                        <div class="panel-head panel-head-row">
+                            <h2>Schedule</h2>
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="visually-hidden" for="matchStatusFilter">Show</label>
+                                <select id="matchStatusFilter" class="form-select form-select-sm">
+                                    <option value="">All matches</option>
+                                    <option value="upcoming">Upcoming</option>
+                                    <option value="live">Live</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                                <span class="count" id="matchCount"></span>
+                            </div>
+                        </div>
+                        <div class="table-wrap">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead><tr><th>Date</th><th>Sport</th><th>Match</th><th>Ground</th><th>Score</th><th>Status</th><th class="text-end">Action</th></tr></thead>
+                                <tbody id="matchBody" data-list="matches"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= ANNOUNCEMENTS ================= -->
+                <section id="announcements" class="admin-section d-none">
+                    <header class="section-head">
+                        <h1>Announcements</h1>
+                        <p>Shown on the home page with the name of who posted them.</p>
+                    </header>
+                    <form id="announcementForm" class="panel mb-4" novalidate>
+                        <div class="panel-head">
+                            <h2>Post announcement</h2>
+                            <p>Trials, venue changes, ceremonies and other news.</p>
+                        </div>
+                        <fieldset class="panel-body">
+                            <legend class="visually-hidden">Announcement</legend>
+                            <div class="mb-3">
+                                <label class="form-label" for="annTitle">Title</label>
+                                <input class="form-control" id="annTitle" name="title" maxlength="80">
+                                <p class="error-text" data-error-for="title"></p>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label" for="annBody">Message <span id="annCount" class="text-secondary small">0 / 500</span></label>
+                                <textarea class="form-control" id="annBody" name="body" rows="3" maxlength="500"></textarea>
+                                <p class="error-text" data-error-for="body"></p>
+                            </div>
+                            <div class="form-check" data-role="admin">
+                                <input class="form-check-input" type="checkbox" id="annPinned" name="pinned">
+                                <label class="form-check-label" for="annPinned">Pin to the top of the home page</label>
+                            </div>
+                        </fieldset>
+                        <div class="panel-foot">
+                            <button class="btn btn-success" type="submit">Post</button>
+                            <button class="btn btn-outline-secondary" type="reset">Clear</button>
+                        </div>
+                    </form>
+                    <div class="panel">
+                        <div class="panel-head panel-head-row"><h2>Posted</h2><span class="count" id="announcementCount"></span></div>
+                        <div class="table-wrap">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead><tr><th>Date</th><th>Title</th><th>Posted by</th><th>Pinned</th><th class="text-end">Action</th></tr></thead>
+                                <tbody id="announcementBody" data-list="announcements"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- result pop-up (admin only) -->
+    <div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="resultTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form id="resultForm" class="modal-content" novalidate>
+                <div class="modal-header">
+                    <h2 class="modal-title h5" id="resultTitle">Enter result</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="resultMatchInfo" class="small text-secondary"></p>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label" for="scoreA" id="scoreALabel">Team A</label>
+                            <input class="form-control" type="number" min="0" max="999" id="scoreA" name="scoreA">
+                            <p class="error-text" data-error-for="scoreA"></p>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" for="scoreB" id="scoreBLabel">Team B</label>
+                            <input class="form-control" type="number" min="0" max="999" id="scoreB" name="scoreB">
+                            <p class="error-text" data-error-for="scoreB"></p>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="resultPom">Player of the match <span class="text-secondary small">(optional)</span></label>
+                            <select class="form-select" id="resultPom" name="playerOfMatch"></select>
+                            <p class="error-text" data-error-for="playerOfMatch"></p>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="resultStatus">Match status</label>
+                            <select class="form-select" id="resultStatus" name="status">
+                                <option value="live">Live (score can still change)</option>
+                                <option value="completed">Completed (counts in the points table)</option>
+                            </select>
+                            <p class="error-text" data-error-for="status"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save result</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- login details pop-up, shown after creating a coordinator or resetting a password -->
+    <div class="modal fade" id="credentialsModal" tabindex="-1" aria-labelledby="credentialsTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title h5" id="credentialsTitle">Login details</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3">Send these details to <strong id="credName"></strong> (<span id="credRole"></span>). They log in on the same login page and see only their own department's portal.</p>
+                    <dl class="credentials">
+                        <dt>Username</dt><dd id="credUsername"></dd>
+                        <dt>Password</dt><dd id="credPassword"></dd>
+                    </dl>
+                    <label class="form-label small" for="credMessage">Message to send</label>
+                    <textarea id="credMessage" class="form-control small" rows="5" readonly></textarea>
+                    <p class="small text-secondary mt-2 mb-0">The password is shown only now. If it is lost, use <em>Reset password</em> to make a new one.</p>
+                </div>
+                <div class="modal-footer">
+                    <span id="copyStatus" class="small text-success me-auto" aria-live="polite"></span>
+                    <button type="button" id="copyCredentials" class="btn btn-outline-success">Copy message</button>
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- small message in the corner after saving -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="toast" class="toast text-bg-success border-0" role="status" aria-live="polite" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="toastText">Saved</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="js/admin.js"></script>
+</body>
+</html>

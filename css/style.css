@@ -1,0 +1,559 @@
+/* style.css
+   Our own CSS, used on every page together with Tailwind (public pages)
+   or Bootstrap (login and admin pages). */
+
+/* colours and spacing kept in custom properties so they can be changed in one place */
+:root {
+    --navy: #0b1f3a;
+    --navy-light: #13305a;
+    --green: #10b981;
+    --green-dark: #047857;
+    --amber: #f59e0b;
+    --red: #dc2626;
+    --gray-100: #f3f4f6;
+    --gray-500: #6b7280;
+    --radius: 12px;
+    --space: 1rem;
+    --shadow: 0 4px 14px rgba(11, 31, 58, 0.08);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* error text under form fields */
+.error-text {
+    color: var(--red);
+    font-size: 0.85rem;
+    min-height: 1.1rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0;
+}
+
+/* hero background on the home page */
+.hero {
+    background:
+        radial-gradient(circle at 85% 20%, rgba(16, 185, 129, 0.35), transparent 40%),
+        linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+}
+
+/* stat cards with CSS Grid: as many columns as fit, each at least 160px */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--space);
+}
+
+.stat-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.25rem;
+    border-top: 4px solid var(--green);
+}
+
+/* stat cards that are buttons (admin overview, home page links) */
+.stat-card-button {
+    width: 100%;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 0;
+    cursor: pointer;
+    color: inherit;
+    text-decoration: none;
+    display: block;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.stat-card-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(11, 31, 58, 0.14);
+}
+
+/* match cards lift a little on hover */
+.match-card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.match-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(11, 31, 58, 0.14);
+}
+
+/* status badges */
+.badge-status {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.badge-upcoming { background: #dbeafe; color: #1d4ed8; }
+.badge-completed { background: #d1fae5; color: var(--green-dark); }
+.badge-live { background: #fee2e2; color: var(--red); }
+
+/* small blinking dot for live matches */
+.badge-live::before {
+    content: "";
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-right: 0.35rem;
+    border-radius: 50%;
+    background: var(--red);
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0.2; }
+}
+
+/* W / D / L circles in the standings table */
+.form-dot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #fff;
+    margin-right: 0.15rem;
+}
+
+.form-W { background: var(--green); }
+.form-D { background: var(--gray-500); }
+.form-L { background: var(--red); }
+
+/* the winner's name and score look bolder */
+.winner {
+    font-weight: 700;
+    color: var(--green-dark);
+}
+
+/* tables scroll sideways on small screens instead of breaking the page */
+.table-wrap {
+    overflow-x: auto;
+}
+
+/* keyboard users see a clear outline */
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+    outline: 3px solid var(--amber);
+    outline-offset: 2px;
+}
+
+/* the active link in the public navbar */
+.nav-link-public.active {
+    color: #fff;
+    border-bottom: 2px solid var(--green);
+}
+
+/* ---------- player / team record pop-up (profile.js) ---------- */
+.name-link {
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: rgba(16, 185, 129, 0.5);
+    text-underline-offset: 3px;
+}
+
+.name-link:hover {
+    color: var(--green-dark);
+    text-decoration-color: var(--green-dark);
+}
+
+.profile-dialog {
+    width: min(640px, calc(100% - 32px));
+    max-height: 85vh;
+    border: 0;
+    border-radius: var(--radius);
+    padding: 0;
+    box-shadow: 0 20px 50px rgba(11, 31, 58, 0.35);
+    color: #1e293b;
+    background: #fff;
+}
+
+.profile-dialog::backdrop {
+    background: rgba(11, 31, 58, 0.55);
+}
+
+.profile-bar {
+    position: sticky;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space);
+    padding: 1rem 1.25rem;
+    background: var(--navy);
+    color: #fff;
+}
+
+.profile-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.profile-close {
+    background: none;
+    border: 0;
+    color: #fff;
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.profile-dialog > div:last-child {
+    padding: 1rem 1.25rem 1.25rem;
+}
+
+.profile-sub {
+    margin: 0 0 0.25rem;
+    color: var(--gray-500);
+    font-size: 0.9rem;
+}
+
+.profile-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.profile-stat {
+    background: var(--gray-100);
+    border-radius: 8px;
+    padding: 0.6rem;
+    text-align: center;
+}
+
+.profile-stat strong {
+    display: block;
+    font-size: 1.4rem;
+    color: var(--navy);
+}
+
+.profile-stat span {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+.profile-heading {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 1rem 0 0.5rem;
+}
+
+.profile-matches,
+.profile-players {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.profile-matches li,
+.profile-players li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 0.9rem;
+}
+
+.profile-date {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+.profile-result {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.profile-score {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.profile-award {
+    display: inline-block;
+    margin-left: 0.4rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #92400e;
+    background: #fef3c7;
+    border-radius: 999px;
+    padding: 0.05rem 0.5rem;
+}
+
+.profile-empty,
+.profile-note {
+    color: var(--gray-500);
+    font-size: 0.8rem;
+}
+
+/* ---------- admin dashboard (Bootstrap pages) ---------- */
+.admin-sidebar {
+    background: var(--navy);
+    min-height: 100vh;
+}
+
+.admin-sidebar .nav-link {
+    color: #cbd5e1;
+    border-radius: 8px;
+    text-align: left;
+}
+
+.admin-sidebar .nav-link:hover,
+.admin-sidebar .nav-link:focus-visible {
+    background: var(--navy-light);
+    color: #fff;
+}
+
+.admin-sidebar .nav-link.active {
+    background: var(--green);
+    color: #fff;
+}
+
+.dashboard-body {
+    background: #eef2f7;
+}
+
+/* section title at the top of each dashboard section */
+.section-head {
+    margin-bottom: 1.25rem;
+}
+
+.section-head h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 0 0 0.25rem;
+}
+
+.section-head p {
+    color: var(--gray-500);
+    margin: 0;
+    max-width: 75ch;
+}
+
+/* every form and table sits in a bordered panel with a green top edge */
+.panel {
+    background: #fff;
+    border: 1px solid #d6dee9;
+    border-top: 4px solid var(--green);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.panel-head {
+    padding: 0.9rem 1.25rem;
+    background: #f7f9fc;
+    border-bottom: 1px solid #e3e9f1;
+}
+
+.panel-head h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 0;
+}
+
+.panel-head p {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+    margin: 0.15rem 0 0;
+}
+
+.panel-head-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.panel-body {
+    padding: 1.25rem;
+    margin: 0;
+    border: 0;
+    min-width: 0;
+}
+
+.panel-foot {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.9rem 1.25rem;
+    background: #f7f9fc;
+    border-top: 1px solid #e3e9f1;
+}
+
+.panel .table {
+    margin: 0;
+}
+
+.panel .table thead th {
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* small grey pill showing how many rows a table has */
+.count {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #475569;
+    background: #e2e8f0;
+    border-radius: 999px;
+    padding: 0.15rem 0.6rem;
+    white-space: nowrap;
+}
+
+/* free / booked time slots */
+.availability {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.slot-row {
+    display: grid;
+    grid-template-columns: minmax(160px, 220px) 1fr;
+    gap: 0.75rem;
+    align-items: start;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #edf1f6;
+}
+
+.slot-row:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.slot-name strong {
+    display: block;
+    color: var(--navy);
+}
+
+.slot-name span {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+}
+
+.slot-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.slot {
+    font-size: 0.78rem;
+    border-radius: 6px;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid;
+    font-variant-numeric: tabular-nums;
+}
+
+.slot-free {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+    color: var(--green-dark);
+}
+
+.slot-booked {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #b91c1c;
+}
+
+/* username / password box in the login details pop-up */
+.credentials {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.4rem 1rem;
+    background: #f1f5f9;
+    border: 1px dashed #94a3b8;
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.credentials dt {
+    font-weight: 600;
+    color: #475569;
+}
+
+.credentials dd {
+    margin: 0;
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 1.05rem;
+    color: var(--navy);
+}
+
+.login-page {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+}
+
+/* footer with flexbox */
+.site-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+/* phones */
+@media (max-width: 768px) {
+    .admin-sidebar {
+        min-height: auto;
+    }
+
+    .site-footer {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .slot-row {
+        grid-template-columns: 1fr;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+}

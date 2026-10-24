@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Points table for each sport, calculated from match results.">
+    <title>Standings | CUI Sports</title>
+    <!-- Tailwind CSS (CDN) is used for all public pages -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/nav.js" defer></script>
+</head>
+<body class="bg-slate-50 text-slate-800">
+    <header class="bg-[#0b1f3a] text-white sticky top-0 z-50 shadow-lg">
+        <nav class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between relative" aria-label="Main">
+            <a href="index.html" class="flex items-center gap-2 font-bold text-lg">
+                <span class="w-9 h-9 rounded-lg bg-emerald-500 grid place-items-center text-sm">CUI</span>
+                <span>Sports Management</span>
+            </a>
+            <button id="menuButton" class="md:hidden p-2 rounded hover:bg-white/10" aria-expanded="false" aria-controls="menu" aria-label="Open menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <ul id="menu" class="hidden md:flex absolute md:static top-16 left-0 right-0 bg-[#0b1f3a] md:bg-transparent flex-col md:flex-row gap-1 md:gap-6 p-4 md:p-0 text-slate-300 shadow-lg md:shadow-none">
+                <li><a class="nav-link-public block py-2 hover:text-white" href="index.html">Home</a></li>
+                <li><a class="nav-link-public block py-2 hover:text-white" href="matches.html">Matches</a></li>
+                <li><a class="nav-link-public block py-2 hover:text-white" href="standings.html">Standings</a></li>
+                <li><a class="nav-link-public block py-2 hover:text-white" href="teams.html">Teams</a></li>
+                <li><a id="authLink" class="block py-2 px-4 rounded-lg bg-emerald-500 text-white font-semibold hover:bg-emerald-600 text-center" href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-10 w-full">
+        <h1 class="text-3xl font-bold">Points table</h1>
+        <p class="text-slate-600 mt-1 mb-6">Worked out automatically from the completed matches.</p>
+        <p id="pageError" class="hidden bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 mb-6" role="alert"></p>
+
+        <div class="flex flex-wrap gap-4 mb-6">
+            <div>
+                <label for="standingSport" class="block text-sm font-medium mb-1">Sport</label>
+                <select id="standingSport" class="border border-slate-300 rounded-lg p-2 bg-white min-w-[12rem]"></select>
+            </div>
+            <div>
+                <label for="standingGender" class="block text-sm font-medium mb-1">Category</label>
+                <select id="standingGender" class="border border-slate-300 rounded-lg p-2 bg-white min-w-[12rem]">
+                    <option value="male">Men</option>
+                    <option value="female">Women</option>
+                </select>
+            </div>
+        </div>
+
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200">
+            <div class="table-wrap">
+                <table class="w-full text-sm">
+                    <caption id="tableTitle" class="text-left font-semibold text-lg p-4"></caption>
+                    <thead class="bg-slate-100 text-slate-600">
+                        <tr>
+                            <th scope="col" class="p-3 text-left">#</th>
+                            <th scope="col" class="p-3 text-left">Team</th>
+                            <th scope="col" class="p-3" title="Played">P</th>
+                            <th scope="col" class="p-3" title="Won">W</th>
+                            <th scope="col" class="p-3" title="Drawn">D</th>
+                            <th scope="col" class="p-3" title="Lost">L</th>
+                            <th scope="col" class="p-3" title="Score for">For</th>
+                            <th scope="col" class="p-3" title="Score against">Agst</th>
+                            <th scope="col" class="p-3" title="Difference">Diff</th>
+                            <th scope="col" class="p-3">Pts</th>
+                            <th scope="col" class="p-3 text-left">Form</th>
+                        </tr>
+                    </thead>
+                    <tbody id="standingBody"></tbody>
+                </table>
+            </div>
+            <p id="pointsRule" class="text-xs text-slate-500 p-4 border-t border-slate-100"></p>
+        </section>
+
+        <section class="mt-12" aria-labelledby="deptTableTitle">
+            <h2 id="deptTableTitle" class="text-2xl font-bold">Overall department table</h2>
+            <p class="text-slate-600 mt-1 mb-4">Every sport, men and women together. The department with the most points wins the sports week trophy.</p>
+            <p id="champion" class="hidden mb-4 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-4 font-semibold"></p>
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 table-wrap">
+                <table class="w-full text-sm">
+                    <thead class="bg-slate-100 text-slate-600">
+                        <tr>
+                            <th scope="col" class="p-3 text-left">#</th>
+                            <th scope="col" class="p-3 text-left">Department</th>
+                            <th scope="col" class="p-3">Teams</th>
+                            <th scope="col" class="p-3">P</th>
+                            <th scope="col" class="p-3">W</th>
+                            <th scope="col" class="p-3">D</th>
+                            <th scope="col" class="p-3">L</th>
+                            <th scope="col" class="p-3">Pts</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deptStandingBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-[#0b1f3a] text-slate-300 mt-12">
+        <div class="site-footer max-w-6xl mx-auto px-4 py-6 text-sm">
+            <p>&copy; <time datetime="2026">2026</time> University Sports Management System, COMSATS University Islamabad</p>
+            <p>Web Technologies midterm project: Muhammad Hasnain Ajmal (FA24-BSE-055), Muhammad Sohail (FA24-BSE-105)</p>
+        </div>
+    </footer>
+
+    <script type="module" src="js/standings-page.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+[
+    {"id": 1, "username": "admin", "password": "Admin@123", "name": "Sports Office Admin", "role": "admin", "type": null, "gender": null, "departmentId": null},
+    {"id": 2, "username": "cs.faculty", "password": "Coord@123", "name": "Dr. Imran Shah", "role": "coordinator", "type": "faculty", "gender": "male", "departmentId": 1},
+    {"id": 3, "username": "cs.student.m", "password": "Coord@123", "name": "Ali Raza", "role": "coordinator", "type": "student", "gender": "male", "departmentId": 1},
+    {"id": 4, "username": "cs.student.f", "password": "Coord@123", "name": "Ayesha Khan", "role": "coordinator", "type": "student", "gender": "female", "departmentId": 1},
+    {"id": 5, "username": "ee.faculty", "password": "Coord@123", "name": "Ms. Rabia Saeed", "role": "coordinator", "type": "faculty", "gender": "female", "departmentId": 2},
+    {"id": 6, "username": "ee.student.m", "password": "Coord@123", "name": "Bilal Ahmed", "role": "coordinator", "type": "student", "gender": "male", "departmentId": 2},
+    {"id": 7, "username": "ee.student.f", "password": "Coord@123", "name": "Hina Shah", "role": "coordinator", "type": "student", "gender": "female", "departmentId": 2},
+    {"id": 8, "username": "ms.faculty", "password": "Coord@123", "name": "Mr. Adeel Raza", "role": "coordinator", "type": "faculty", "gender": "male", "departmentId": 3},
+    {"id": 9, "username": "ms.student.m", "password": "Coord@123", "name": "Usman Tariq", "role": "coordinator", "type": "student", "gender": "male", "departmentId": 3},
+    {"id": 10, "username": "ms.student.f", "password": "Coord@123", "name": "Sana Malik", "role": "coordinator", "type": "student", "gender": "female", "departmentId": 3},
+    {"id": 11, "username": "mth.faculty", "password": "Coord@123", "name": "Dr. Nazia Parveen", "role": "coordinator", "type": "faculty", "gender": "female", "departmentId": 4},
+    {"id": 12, "username": "mth.student.m", "password": "Coord@123", "name": "Hamza Iqbal", "role": "coordinator", "type": "student", "gender": "male", "departmentId": 4},
+    {"id": 13, "username": "mth.student.f", "password": "Coord@123", "name": "Fatima Noor", "role": "coordinator", "type": "student", "gender": "female", "departmentId": 4},
+    {"id": 14, "username": "phy.faculty", "password": "Coord@123", "name": "Mr. Shahid Latif", "role": "coordinator", "type": "faculty", "gender": "male", "departmentId": 5},
+    {"id": 15, "username": "phy.student.m", "password": "Coord@123", "name": "Zain Abbas", "role": "coordinator", "type": "student", "gender": "male", "departmentId": 5},
+    {"id": 16, "username": "phy.student.f", "password": "Coord@123", "name": "Maryam Javed", "role": "coordinator", "type": "student", "gender": "female", "departmentId": 5}
+]

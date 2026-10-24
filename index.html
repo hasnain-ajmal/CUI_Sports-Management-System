@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Schedules, live scores, results and standings of COMSATS university sports.">
+    <title>Home | CUI Sports</title>
+    <!-- Tailwind CSS (CDN) is used for all public pages -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/nav.js" defer></script>
+</head>
+<body class="bg-slate-50 text-slate-800">
+    <header class="bg-[#0b1f3a] text-white sticky top-0 z-50 shadow-lg">
+        <nav class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between relative" aria-label="Main">
+            <a href="index.html" class="flex items-center gap-2 font-bold text-lg">
+                <span class="w-9 h-9 rounded-lg bg-emerald-500 grid place-items-center text-sm">CUI</span>
+                <span>Sports Management</span>
+            </a>
+            <button id="menuButton" class="md:hidden p-2 rounded hover:bg-white/10" aria-expanded="false" aria-controls="menu" aria-label="Open menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <ul id="menu" class="hidden md:flex absolute md:static top-16 left-0 right-0 bg-[#0b1f3a] md:bg-transparent flex-col md:flex-row gap-1 md:gap-6 p-4 md:p-0 text-slate-300 shadow-lg md:shadow-none">
+                <li><a class="nav-link-public block py-2 hover:text-white" href="index.html">Home</a></li>
+                <li><a class="nav-link-public block py-2 hover:text-white" href="matches.html">Matches</a></li>
+                <li><a class="nav-link-public block py-2 hover:text-white" href="standings.html">Standings</a></li>
+                <li><a class="nav-link-public block py-2 hover:text-white" href="teams.html">Teams</a></li>
+                <li><a id="authLink" class="block py-2 px-4 rounded-lg bg-emerald-500 text-white font-semibold hover:bg-emerald-600 text-center" href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero text-white">
+            <div class="max-w-6xl mx-auto px-4 py-16 md:py-24 grid md:grid-cols-2 gap-10 items-center">
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">Every match, team and result in one place</h1>
+                    <p class="mt-4 text-slate-300 text-lg">Follow the university sports week: see upcoming fixtures, live matches, results and the points table of every sport.</p>
+                    <div class="mt-8 flex flex-wrap gap-3">
+                        <a href="matches.html" class="px-5 py-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 font-semibold">View matches</a>
+                        <a href="standings.html" class="px-5 py-3 rounded-lg border border-white/30 hover:bg-white/10 font-semibold">Points table</a>
+                    </div>
+                </div>
+                <div id="liveBox" class="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur">
+                    <h2 class="font-semibold mb-3 text-slate-200">Live now</h2>
+                    <div id="liveList" class="grid gap-3 text-slate-800"></div>
+                </div>
+            </div>
+        </section>
+
+        <div class="max-w-6xl mx-auto px-4 -mt-8">
+        <p id="pageError" class="hidden bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 mb-6" role="alert"></p>
+            <section aria-label="Statistics">
+                <div id="stats" class="stat-grid"></div>
+            </section>
+        </div>
+
+        <div class="max-w-6xl mx-auto px-4 mt-12 grid lg:grid-cols-2 gap-10">
+            <section>
+                <div class="flex items-end justify-between mb-4">
+                    <h2 class="text-2xl font-bold">Upcoming matches</h2>
+                    <a href="matches.html?status=upcoming" class="text-emerald-700 hover:underline text-sm font-semibold">See all</a>
+                </div>
+                <div id="upcomingList" class="grid gap-4"></div>
+            </section>
+            <section>
+                <div class="flex items-end justify-between mb-4">
+                    <h2 class="text-2xl font-bold">Latest results</h2>
+                    <a href="matches.html?status=completed" class="text-emerald-700 hover:underline text-sm font-semibold">See all</a>
+                </div>
+                <div id="resultsList" class="grid gap-4"></div>
+            </section>
+        </div>
+
+        <section class="max-w-6xl mx-auto px-4 mt-12">
+            <h2 class="text-2xl font-bold mb-4">Announcements</h2>
+            <div id="announcementList" class="grid md:grid-cols-2 gap-4"></div>
+        </section>
+    </main>
+
+    <footer class="bg-[#0b1f3a] text-slate-300 mt-12">
+        <div class="site-footer max-w-6xl mx-auto px-4 py-6 text-sm">
+            <p>&copy; <time datetime="2026">2026</time> University Sports Management System, COMSATS University Islamabad</p>
+            <p>Web Technologies midterm project: Muhammad Hasnain Ajmal (FA24-BSE-055), Muhammad Sohail (FA24-BSE-105)</p>
+        </div>
+    </footer>
+
+    <script type="module" src="js/home.js"></script>
+</body>
+</html>
